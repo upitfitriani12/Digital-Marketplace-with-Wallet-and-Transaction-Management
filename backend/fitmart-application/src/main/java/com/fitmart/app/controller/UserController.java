@@ -44,73 +44,70 @@ public class UserController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<?> getOne(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id) {
-        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
-        Date currentDate = new Date();
-        boolean isUserIdJWTequalsUserIdReqParams = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-        if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
-            return Res.renderJson(UserResponse.fromUser(user_service.getById(id)), "User ID Retrieved Successfully", HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(
+    public ResponseEntity<?> getByUser(
             @RequestHeader(name = "Authorization") String access_token,
-            @PageableDefault(page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable page,
-            @ModelAttribute RegisterUserRequest registerUserRequest
-    ){
-        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
-        Date currentDate = new Date();
-        String getToken = jwtPayload.getSubject();
-        String getAdmin = adminService.getById(getToken).getId();
-        boolean isAdminIdJWTEqualsAdminIdReqParams = jwtPayload.getSubject().equals(getAdmin);
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-
-        if (isAdminIdJWTEqualsAdminIdReqParams && isTokenNotYetExpired){
-            PageResponse<UserResponse> res = new PageResponse<>(UserResponse.convertToUserResponsePage(user_service.getAll(page,registerUserRequest)));
-            return Res.renderJson(res,"ok",HttpStatus.OK);
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
-    }
-
-    @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody RegisterUserRequest request) {
+            @PathVariable String id
+    ) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
         String userIdFromToken = jwtPayload.getSubject();
-        boolean isUserIdJWTequalsUserIdReqParams = userIdFromToken.equals(adminService.getById(userIdFromToken).getId());
         boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+        boolean isUserIdJWTequalsUserIdReqParams = userIdFromToken.equals(id);
+
+        if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
+            return Res.renderJson(
+                    UserResponse.fromUser(user_service.getById(id)),
+                    "User ID Retrieved Successfully",
+                    HttpStatus.OK
+            );
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> update(
+            @RequestHeader(name = "Authorization") String access_token,
+            @RequestBody RegisterUserRequest request
+    ) {
+        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+        Date currentDate = new Date();
+
+        String userIdFromToken = jwtPayload.getSubject();
+        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+        boolean isUserIdJWTequalsUserIdReqParams = userIdFromToken.equals(request.getId());
 
         if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
             UserResponse updatedUser = UserResponse.fromUser(user_service.update(request));
             return ResponseEntity.ok(updatedUser);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to update user");
         }
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id) {
+    public ResponseEntity<?> delete(
+            @RequestHeader(name = "Authorization") String access_token,
+            @PathVariable String id
+    ) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
-        String getAdmin = adminService.getById(jwtPayload.getSubject()).getId();
-        boolean isUserIdJWTequalsUserIdReqParams = jwtPayload.getSubject().equals(getAdmin);
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
 
-        if (isUserIdJWTequalsUserIdReqParams && isTokenNotYetExpired) {
+        String userIdFromToken = jwtPayload.getSubject();
+        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
+        boolean isUserDeletingOwnAccount = userIdFromToken.equals(id);
+
+        if (isUserDeletingOwnAccount && isTokenNotYetExpired) {
             try {
                 user_service.delete(id);
-                return Res.renderJson(null, "User Deleted Successfully", HttpStatus.OK);
+                return Res.renderJson(null, "User deleted successfully", HttpStatus.OK);
             } catch (Exception e) {
-                return Res.renderJson(null, "Failed to Delete User", HttpStatus.INTERNAL_SERVER_ERROR);
+                return Res.renderJson(null, "Failed to delete user", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Failed to Find");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Forbidden: you can only delete your own account.");
         }
     }
-
 
 }

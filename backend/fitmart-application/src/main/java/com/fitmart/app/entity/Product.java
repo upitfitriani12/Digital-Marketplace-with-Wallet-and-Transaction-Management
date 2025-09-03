@@ -24,4 +24,11 @@ public class Product {
     @JsonIgnore
     List<Transaction> transaction_list;
 
+    @ManyToMany
+    @JoinTable(
+            name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
 }

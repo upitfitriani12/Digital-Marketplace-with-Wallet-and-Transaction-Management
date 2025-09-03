@@ -4,6 +4,8 @@ import com.fitmart.app.entity.Product;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,11 +19,6 @@ public class ProductRequest {
     @NotNull(message = "Price cannot be null")
     private Integer price;
 
-    public Product convert(){
-        return Product.builder()
-                .name(name)
-                .price(price)
-                .build();
-    }
+    private List<String> categoryIds;
 
 }

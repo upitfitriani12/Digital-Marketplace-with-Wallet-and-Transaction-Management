@@ -9,6 +9,6 @@ public interface ProductService {
     Product create(ProductRequest request);
     Page<Product> getAll(Pageable pageable, ProductRequest request);
     Product getById(String id);
-    Product update(Product request);
+    Product update(String id, ProductRequest request);
     void delete(String id);
 }

@@ -30,16 +30,15 @@ public class ProductController {
     private final JwtUtils jwtUtils;
 
     @PostMapping()
-    public ResponseEntity<?> create(@RequestBody ProductRequest request, @RequestHeader(name = "Authorization") String access_token) {
-        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+    public ResponseEntity<?> create(@Valid @RequestBody ProductRequest request, @RequestHeader(name = "Authorization") String accessToken) {
+        Claims jwtPayload = jwtUtils.decodeAccessToken(accessToken);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-
-        if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
+        boolean isAdmin = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());
+        boolean isTokenValid = currentDate.before(jwtPayload.getExpiration());
+        if (isAdmin && isTokenValid) {
             Product product = productService.create(request);
             ProductResponse response = ProductResponse.fromProduct(product);
-            return Res.renderJson(response, "Product ID Retrieved Successfully", HttpStatus.OK);
+            return Res.renderJson(response, "Product created successfully", HttpStatus.CREATED);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
         }
@@ -78,21 +77,21 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");}
     }
 
-    @PutMapping(path = "/update")
-    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody Product request) {
-        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String accessToken,
+                                    @PathVariable String id,
+                                    @Valid @RequestBody ProductRequest request) {
+        Claims jwtPayload = jwtUtils.decodeAccessToken(accessToken);
         Date currentDate = new Date();
-        boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-
-        if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
-            Product updatedProduct = productService.update(request);
+        boolean isAdmin = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());
+        boolean isTokenValid = currentDate.before(jwtPayload.getExpiration());
+        if (isAdmin && isTokenValid) {
+            Product updatedProduct = productService.update(id, request);
             return ResponseEntity.ok(ProductResponse.fromProduct(updatedProduct));
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
         }
     }
-
 
     @DeleteMapping(path = "/{id_product}")
     public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_product) {
