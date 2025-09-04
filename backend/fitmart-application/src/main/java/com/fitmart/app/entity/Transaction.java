@@ -21,9 +21,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Integer quantity;
-    private Date date_start;
-    private Date date_end;
-    private Integer duration;
     private Integer price_history;
     private Integer total;
 

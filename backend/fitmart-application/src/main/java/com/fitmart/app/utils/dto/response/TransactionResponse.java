@@ -1,6 +1,5 @@
 package com.fitmart.app.utils.dto.response;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +21,6 @@ public class TransactionResponse {
     private Integer price_history;
     private String email;
     private String product_name;
-    private Date date_start;
-    private Date date_end;
-    private Integer duration;
     private Integer total;
 
 
@@ -37,9 +33,6 @@ public class TransactionResponse {
                 .email(transaction.getUser().getEmail())
                 .product_name(transaction.getProduct().getName())
                 .price_history(transaction.getPrice_history())
-                .date_start(transaction.getDate_start())
-                .date_end(transaction.getDate_end())
-                .duration(transaction.getDuration())
                 .total(transaction.getTotal())
                 .build();
     }

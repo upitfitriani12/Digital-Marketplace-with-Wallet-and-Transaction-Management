@@ -18,7 +18,6 @@ public class WalletResponse {
 
     private String id;
     private Integer balance;
-    private String email;
 
     public static WalletResponse fromWallet(Wallet wallet){
         String user_id = (wallet.getUser() != null) ? wallet.getUser().getId() : null;
@@ -26,7 +25,6 @@ public class WalletResponse {
         return WalletResponse.builder()
                 .id(wallet.getId())
                 .balance(wallet.getBalance())
-                .email(wallet.getUser().getEmail())
                 .build();
     }
 
@@ -38,8 +36,5 @@ public class WalletResponse {
 
         return new PageImpl<>(userResponses, userPage.getPageable(), userPage.getTotalElements());
     }
-
-
-
 
 }

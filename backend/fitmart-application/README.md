@@ -310,7 +310,7 @@
 }
 ```
 
-### 4. Delete User
+### 5. Delete User
 - Endpoint: DELETE /users/{id}
 - Headers: Authorization: Bearer <user_token>
 - Response (200 OK):
@@ -737,5 +737,232 @@
 }
 ```
 
+## WALLET
+### 1. Create wallet
+- Endpoint: POST /categories
+- Content-Type: application/json
+- Headers: Authorization: Bearer <user_token>
+- Request Body:
+```json
+{
+  "balance": 1000000,
+  "user_id": "7a5dcdaa-0381-41d2-bfa8-3823eb0b58b5"
+}
+```
+- Response (200 OK):
+```json
+{
+  "data": {
+    "id": "af9a1340-1b57-4e58-b528-20523f6e25f6",
+    "balance": 1000000
+  },
+  "message": "wallet ID Retrieved Successfully"
+}
+```
+- Response Error (Token using admin) : 500 Internal Server Error
+```json
+{
+  "data": null,
+  "message": "An error occurred: User not found"
+}
+```
+
+### 2. Get by id users wallet
+- Endpoint: GET /wallets/me
+- Content-Type: application/json
+- Headers: Authorization: Bearer <user_token>
+- Response (200 OK):
+```json
+{
+    "data": {
+        "id": "af9a1340-1b57-4e58-b528-20523f6e25f6",
+        "balance": 1000000
+    },
+    "message": "Wallet Retrieved Successfully"
+}
+```
+
+### 3. Update wallet
+- Endpoint: PUT /categories
+- Content-Type: application/json
+- Headers: Authorization: Bearer <user_token>
+- Request Body:
+```json
+{
+  "id": "af9a1340-1b57-4e58-b528-20523f6e25f6",
+  "balance": 2000000,
+  "user_id": "7a5dcdaa-0381-41d2-bfa8-3823eb0b58b5"
+}
+```
+- Response (200 OK):
+```json
+{
+  "data": {
+    "id": "af9a1340-1b57-4e58-b528-20523f6e25f6",
+    "balance": 1000000
+  },
+  "message": "wallet ID Retrieved Successfully"
+}
+```
+- Response error (id wrong) : 500 Internal Server Error
+```json
+{
+    "data": null,
+    "message": "An error occurred: Wallet not found"
+}
+```
 
 ## TRANSACTION
+### 1. Create transaction
+- Endpoint: POST /transactions
+- Content-Type: application/json
+- Headers: Authorization: Bearer <user_token>
+- Request Body:
+```json
+{
+  "quantity": 2,
+  "price_history": 30000,
+  "user_id": "af9a1340-1b57-4e58-b528-20523f6e25f6",
+  "product_id": "0e9dbd8b-f61d-43de-80ea-b9af07aa44a8"
+}
+```
+- Response (201 Created):
+```json
+{
+    "data": {
+        "id": "a2bed405-7a32-4623-90c5-503987633add",
+        "quantity": 2,
+        "price_history": 30000,
+        "email": "user3@gmail.com",
+        "product_name": "Fitmart brand facial cleanser",
+        "total": 60000
+    },
+    "message": "Transaction Created Successfully"
+}
+```
+
+### 2. Get All transaction (admin FitMart only)
+- Endpoint: POST /transactions
+- Content-Type: application/json
+- Headers: Authorization: Bearer <admin_token>
+- Response (200 OK):
+```json
+{
+    "data": {
+        "content": [
+            {
+                "id": "30119d9d-44c1-4269-a5e4-0417ba00251a",
+                "quantity": 10,
+                "price_history": 5000,
+                "email": "user2@gmail.com",
+                "product_name": "Mineral Water (1L)",
+                "total": 50000
+            },
+            {
+                "id": "9d20f43e-cb81-4f15-8e67-8cf491de4acb",
+                "quantity": 1,
+                "price_history": 30000,
+                "email": "user3@gmail.com",
+                "product_name": "Fitmart brand facial cleanser",
+                "total": 30000
+            },
+            {
+                "id": "a2bed405-7a32-4623-90c5-503987633add",
+                "quantity": 2,
+                "price_history": 30000,
+                "email": "user3@gmail.com",
+                "product_name": "Fitmart brand facial cleanser",
+                "total": 60000
+            }
+        ],
+        "total_elements": 3,
+        "total_pages": 1,
+        "page": 0,
+        "size": 10
+    },
+    "message": "ok"
+}
+```
+- Response Error (using user) : 404 Not Found
+````json
+{
+    "data": null,
+    "message": "404 Admin with id 7a5dcdaa-0381-41d2-bfa8-3823eb0b58b5 is not found"
+}
+````
+### 3. Get By ID transaction (admin FitMart only)
+- Endpoint: GET /transactions/{id}
+- Headers: Authorization: Bearer <admin_token>
+- Response (200 OK):
+```json
+{
+    "data": {
+        "id": "30119d9d-44c1-4269-a5e4-0417ba00251a",
+        "quantity": 10,
+        "price_history": 5000,
+        "email": "user2@gmail.com",
+        "product_name": "Mineral Water (1L)",
+        "total": 50000
+    },
+    "message": "Transaction ID Retrieved Successfully"
+}
+```
+- Response Error (using user) : 404 Not Found
+````json
+{
+    "data": null,
+    "message": "404 Admin with id 7a5dcdaa-0381-41d2-bfa8-3823eb0b58b5 is not found"
+}
+````
+
+### 4. Get By ID transaction (user only)
+- Endpoint: GET /transactions/me
+- Headers: Authorization: Bearer <admin_token>
+- Response (200 OK):
+```json
+{
+    "data": [
+        {
+            "id": "30119d9d-44c1-4269-a5e4-0417ba00251a",
+            "quantity": 10,
+            "price_history": 5000,
+            "email": "user2@gmail.com",
+            "product_name": "Mineral Water (1L)",
+            "total": 50000
+        }
+    ],
+    "message": "Transaction ID Retrieved Successfully"
+}
+```
+- Response Error (using token with admin) : 404 Not Found
+```json
+{
+    "data": null,
+    "message": "404 User with id 90345749-73c4-409c-94b1-4c6c68f9efff is not found"
+}
+```
+
+### 5. Delete Transaction (admin only)
+- Endpoint: DELETE /transaction/{id}
+- Headers: Authorization: Bearer <admin_token>
+- Response (200 OK):
+```json
+{
+  "data": null,
+  "message": "Transaction Deleted Successfully"
+}
+```
+- Response Error (wrong id) : 500 Internal Server Error
+```json
+{
+    "data": null,
+    "message": "Failed to Delete Transaction"
+}
+```
+- Response Error (using token user) : 404 Not Found
+```json
+{
+    "data": null,
+    "message": "404 Admin with id 7ad815c8-bfbd-4a77-82d8-7bf398bc6d7c is not found"
+}
+```

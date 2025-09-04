@@ -21,8 +21,6 @@ public class TransactionRequest {
     @NotNull(message = "User id cannot be null")
     private String user_id;
     private String product_id;
-    private Date date_start;
-    private Date date_end;
     private Integer total;
 
     public Transaction convert(){
@@ -30,16 +28,7 @@ public class TransactionRequest {
         transaction.setId(id);
         transaction.setQuantity(quantity);
         transaction.setPrice_history(price_history);
-        transaction.setDate_start(date_start);
-        transaction.setDate_end(date_end);
         transaction.setTotal(total);
-
-
-        if(date_start != null && date_end != null){
-            long diffInMillies = Math.abs(date_end.getTime() - date_start.getTime());
-            int diff = (int) (diffInMillies / (1000 * 60 * 60 * 24));
-            transaction.setDuration(diff);
-        }
 
         if(user_id != null){
             User transactionUser = new User();

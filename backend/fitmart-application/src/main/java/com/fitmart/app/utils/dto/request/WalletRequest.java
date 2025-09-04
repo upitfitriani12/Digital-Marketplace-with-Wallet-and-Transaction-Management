@@ -13,22 +13,15 @@ import lombok.*;
 public class WalletRequest {
 
     private String id;
+    private String userId;
 
     @NotNull(message = "Balance cannot be null")
     private Integer balance;
 
-    @NotBlank(message = "User ID cannot be blank")
-    private String user_id;
-
-    public Wallet convert(){
+    public Wallet convert() {
         Wallet wallet = new Wallet();
-        wallet.setId(id);
-        wallet.setBalance(balance);
-        if(user_id != null){
-            User userWallet = new User();
-            userWallet.setId(user_id);
-            wallet.setUser(userWallet);
-        }
+        wallet.setId(this.id);
+        wallet.setBalance(this.balance);
         return wallet;
     }
 }

@@ -10,16 +10,10 @@ import com.fitmart.app.utils.dto.response.TransactionResponse;
 import com.fitmart.app.utils.dto.webResponse.PageResponse;
 import com.fitmart.app.utils.dto.webResponse.Res;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Sort;
 
 import io.jsonwebtoken.Claims;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -43,7 +37,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/transactions")
 public class TransactionController {
     private final TransactionService transactionService;
     private final UserService userService;
@@ -94,8 +88,8 @@ public class TransactionController {
     }
 
 
-    @GetMapping(path = "/{id_transaction}")
-    public ResponseEntity<?> getById(@RequestHeader(name = "Authorization") String access_token, @PathVariable String id_transaction) {
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<?> getById(@RequestHeader(name = "Authorization") String access_token, @PathVariable ("id") String id_transaction) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
         String userIdFromToken = jwtPayload.getSubject();
@@ -128,28 +122,8 @@ public class TransactionController {
     }
 
 
-
-
-    @PutMapping(path = "/update")
-    public ResponseEntity<?> update(@RequestHeader(name = "Authorization") String access_token, @RequestBody TransactionRequest request) {
-        Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
-        Date currentDate = new Date();
-        String adminIdFromToken = jwtPayload.getSubject();
-        String adminId = adminService.getById(adminIdFromToken).getId();
-        boolean isProductIdJWTequalsProductIdReqParams = adminIdFromToken.equals(adminId);
-        boolean isTokenNotYetExpired = currentDate.before(jwtPayload.getExpiration());
-
-        if (isProductIdJWTequalsProductIdReqParams && isTokenNotYetExpired) {
-            Transaction updatedProduct = transactionService.update(request);
-            return ResponseEntity.ok(TransactionResponse.fromTransaction(updatedProduct));
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied or Token expired");
-        }
-    }
-
-
-    @DeleteMapping(path = "/{idTransaction}")
-    public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable String idTransaction) {
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> delete(@RequestHeader(name = "Authorization") String access_token, @PathVariable ("id") String idTransaction) {
         Claims jwtPayload = jwtUtils.decodeAccessToken(access_token);
         Date currentDate = new Date();
         boolean isProductIdJWTequalsProductIdReqParams = jwtPayload.getSubject().equals(adminService.getById(jwtPayload.getSubject()).getId());

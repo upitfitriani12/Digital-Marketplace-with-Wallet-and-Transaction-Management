@@ -40,4 +40,3 @@ public class JwtUtils {
                 .build().parseSignedClaims(accessToken).getPayload();
     }
 }
-

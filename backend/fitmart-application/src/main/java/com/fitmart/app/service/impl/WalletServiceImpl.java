@@ -1,14 +1,12 @@
 package com.fitmart.app.service.impl;
 
+import com.fitmart.app.entity.User;
 import com.fitmart.app.entity.Wallet;
+import com.fitmart.app.repository.UserRepository;
 import com.fitmart.app.repository.WalletRepository;
 import com.fitmart.app.service.WalletService;
-import com.fitmart.app.utils.GeneralSpecification;
 import com.fitmart.app.utils.dto.request.WalletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
@@ -18,40 +16,37 @@ import org.springframework.web.client.HttpServerErrorException;
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public Wallet create(WalletRequest request) {
-        return walletRepository.saveAndFlush(request.convert());
-    }
+    public Wallet create(WalletRequest request, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    @Override
-    public Page<Wallet> getAll(Pageable pageable, WalletRequest request) {
-        Specification<Wallet> specification =   GeneralSpecification.getSpecification(request);
-        return walletRepository.findAll(specification, pageable);
-    }
+        walletRepository.findByUser_Id(userId).ifPresent(w -> {
+            throw new RuntimeException("Wallet already exists for this user");
+        });
 
-    @Override
-    public Wallet getById(String id) {
-        return walletRepository.findById(id)
-                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "Wallet with id " + id + " is not found"));
-    }
+        Wallet wallet = request.convert();
+        wallet.setUser(user);
 
-    public Wallet fineByUserId(String userId) {
-        return walletRepository.findByUserId(userId);
-
+        return walletRepository.saveAndFlush(wallet);
     }
 
     @Override
-    public Wallet update(WalletRequest request) {
-        Integer hasil = request.getBalance() + getById(request.getId()).getBalance();
-        request.setBalance(hasil);
-        return walletRepository.saveAndFlush(request.convert());
+    public Wallet findByUserId(String userId) {
+        return walletRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND,
+                        "Wallet for user " + userId + " is not found"));
     }
 
     @Override
-    public void delete(String id) {
-        this.getById(id);
-        walletRepository.deleteById(id);
+    public Wallet update(WalletRequest request, String userId) {
+        Wallet wallet = walletRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        wallet.setBalance(request.getBalance());
+        return walletRepository.saveAndFlush(wallet);
     }
+
 }
-
