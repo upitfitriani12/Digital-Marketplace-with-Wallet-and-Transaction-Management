@@ -1,5 +1,22 @@
+# About the Company Name - FitMart
+The name FitMart comes from its founder's name, "Fit," which is taken from Upit Fitriani, 
+combined with "Mart," a common abbreviation for a marketplace or online store 
+that provides various all-in-one customer needs, offering a wide range of product categories, 
+from daily necessities, food & beverages, electronics, to fashion.
+
+#### FitMart Admin 
+- Store owner who manages Users, Categories, Products, and Transactions
+- Only admins can add, update, and delete categories/products
+- Can monitor all customer transactions
+
+#### User (Customer)
+- Shoppers who purchase products from FitMart
+- Can register, log in, and own a wallet as a digital balance
+- The wallet is used to make payments when purchasing products
+- Can only manage their own account and transactions
+
 # FitMart API Documentation
-### Base URL : http://localhost:8080
+### Base URL : `http://localhost:8080`
 
 ## ADMIN
 ### 1. Register Admin
@@ -42,7 +59,7 @@
 ```
 
 ### 3. Get Admin By ID
-- Endpoint: POST /admins/{id}
+- Endpoint: GET /admins/{id}
 - Headers: Authorization: Bearer <admin_token>
 - Response (200 OK):
 ```json
@@ -65,7 +82,7 @@
 ```
 
 ### 4. Get All Admin
-- Endpoint: POST /admins
+- Endpoint: GET /admins
 - Headers: Authorization: Bearer <admin_token>
 - Response (200 OK):
 ```json
@@ -173,7 +190,7 @@
 ```
 
 ### 8. Get All User (Admin Only)
-- Endpoint: GET /admins/update/admins/users
+- Endpoint: GET /admins/users
 - Headers: Authorization: Bearer <admin_token>
 - Response (200 OK):
 ```json
@@ -348,7 +365,7 @@
   "message": "Category created successfully"
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
   "data": null,
@@ -356,7 +373,7 @@
 }
 ```
 
-### 2. Get All Category
+### 2. Get All Category (admin & user)
 - Endpoint: GET /categories
 - Headers: Authorization: Bearer <admin_token or user_token>
 - Response (200 OK):
@@ -453,7 +470,7 @@
   "name": "Seafood"
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
   "data": null,
@@ -467,6 +484,7 @@
   "message": "An error occurred: Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect): [com.fitmart.app.entity.Category#df0c2bf6-c617-46a1-8574-6706132jkjk50]"
 }
 ```
+
 ### 5. Delete Category
 - Endpoint: DELETE /categories/{id}
 - Headers: Authorization: Bearer <admin_token>
@@ -477,7 +495,7 @@
   "message": "Category deleted successfully"
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
   "data": null,
@@ -491,7 +509,6 @@
   "message": "Failed to delete category"
 }
 ```
-
 
 ## PRODUCT
 ### 1. Create Product
@@ -523,7 +540,7 @@
   "message": "Product created successfully"
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
     "data": null,
@@ -704,7 +721,7 @@
   ]
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
   "data": null,
@@ -722,7 +739,7 @@
     "message": "Product Deleted Successfully"
 }
 ```
-- Response Error (token using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
   "data": null,
@@ -759,7 +776,7 @@
   "message": "wallet ID Retrieved Successfully"
 }
 ```
-- Response Error (Token using admin) : 500 Internal Server Error
+- Response Error (using admin token) : 500 Internal Server Error
 ```json
 {
   "data": null,
@@ -883,13 +900,14 @@
     "message": "ok"
 }
 ```
-- Response Error (using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ````json
 {
     "data": null,
     "message": "404 Admin with id 7a5dcdaa-0381-41d2-bfa8-3823eb0b58b5 is not found"
 }
 ````
+
 ### 3. Get By ID transaction (admin FitMart only)
 - Endpoint: GET /transactions/{id}
 - Headers: Authorization: Bearer <admin_token>
@@ -907,7 +925,7 @@
     "message": "Transaction ID Retrieved Successfully"
 }
 ```
-- Response Error (using user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ````json
 {
     "data": null,
@@ -934,7 +952,7 @@
     "message": "Transaction ID Retrieved Successfully"
 }
 ```
-- Response Error (using token with admin) : 404 Not Found
+- Response Error (using admin token) : 404 Not Found
 ```json
 {
     "data": null,
@@ -959,7 +977,7 @@
     "message": "Failed to Delete Transaction"
 }
 ```
-- Response Error (using token user) : 404 Not Found
+- Response Error (using user token) : 404 Not Found
 ```json
 {
     "data": null,
